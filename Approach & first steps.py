@@ -2,6 +2,7 @@
 
 #https://opentdb.com/api_config.php
 
+
 #manually generated API https://opentdb.com/api.php?amount=10&category=10&difficulty=easy&type=multiple
 
 #simple creating an API manually to test
