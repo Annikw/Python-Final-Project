@@ -2,6 +2,37 @@ from unicodedata import category
 import requests
 import random
 
+#----------------Data cleaning-------------------------
+'''
+Create functions for data cleaning
+'''
+#define function that automatically replaces multiple substrings in string
+def replace_all(text, dic):
+    for i, j in dic.items():
+        text = text.replace(i, j)
+    return text
+
+#define dictionary that takes the to-be replaced string as key and the replacements as values
+replacement_values = {"#quot;": "'", "quot;": "'", "#039;": "'", "039;": "'"}
+
+#iterate through response data and clean all questions
+def clean_dataset(dataset):
+    for d in dataset["results"]:
+        d["question"] = d["question"].replace("&", "")
+        d["question"] = replace_all(d["question"], replacement_values)
+
+        d["correct_answer"] = d["correct_answer"].replace("&", "")
+        d["correct_answer"] = replace_all(d["correct_answer"], replacement_values)
+        
+        for item in d["incorrect_answers"][0:3]:
+            item = item.replace("&", "")
+            item = replace_all(item, replacement_values)
+            d["incorrect_answers"].append(item)
+        del d["incorrect_answers"][0:3]
+    return dataset
+
+
+"""
 #----------------Creating dictionaries for all possible Question settings-------------------------
 ''' the dictionaries will allow the user to choose the category, difficulty and question type of the questions in the quiz
 '''
@@ -155,7 +186,7 @@ else:
     print("You final score is:", Score,"/",(NB_Questions), "or", (Score/NB_Questions)*100,"%" )
 
 
-
+"""
 #--------------------------------OOP based approach try-out------------
 '''Note from Annik: here we could also try to always extract a mix of difficulties from the API by selecting 'Any difficulty' 
 This way, based on whether the previous answer was right or wrong --> the next question could have a different difficulty (the professor proposed
@@ -177,10 +208,13 @@ response = requests.get(url)
 response_json = response.json()
 
 
+#clean data
+clean_dataset(response_json) 
+
 #here we are creating a class for all the questions, not sure whether it will be necessary but it is quite easy and might make it easier to work with Quiz class after? 
 #@Wilm feel free to change though
 class Question:    
-    def _init_(self, category, q_type, difficulty, question, correct_answer, incorrect_answers):        
+    def __init__(self, category, q_type, difficulty, question, correct_answer, incorrect_answers):        
         self.category = category
         self.type = q_type
         self.difficulty = difficulty
@@ -210,7 +244,7 @@ for i in response_json['results']:
 
     
 class Quiz:
-    def _init_(self, number_questions_total, q_list_easy, q_list_medium, q_list_hard):
+    def __init__(self, number_questions_total, q_list_easy, q_list_medium, q_list_hard):
         
         self.number_questions_total = number_questions_total
         self.question_score = 0
