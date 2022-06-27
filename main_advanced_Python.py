@@ -1,29 +1,26 @@
+from tkinter import MULTIPLE
+from unicodedata import category
 import requests
 import random
 
-
-#Dictionary for the categories
 Categories = {0 : "Random", 9 : 'General Knowledge', 10 : 'Entertainment: Books', 11: 'Entertainment: Film', 12 : 'Entertainment: Music',
         13 : 'Entertainment: Musicals & Theatres', 14: 'Entertainment: Television', 15:'Entertainment: Video Games', 16 :'Entertainment: Board Games',
         17 : 'Science & Nature', 18:'Science: Computers', 19: 'Science: Mathematics', 20 : 'Mythology', 21 : 'Sports', 22: 'Geography',
         23 : 'History', 24 : 'Politics', 25 : 'Art', 26:'Celebrities', 27 : 'Animals', 28 : 'Vehicles', 29 :  'Entertainment: Comics',
         30 : 'Science: Gadgets', 31: 'Entertainment: Japanese Anime & Manga', 32 : 'Entertainment: Cartoon & Animations'}
 
-#Dictionary for the categories
 Difficulty = {1: "easy", 2: "medium", 3: "hard"}
 
-#Dictionary for the type: Allows the user to type 1 or 2, and will user the other dict to format the answer for the URL
 Type1 = {1 : "True/False", 2 : "Multiple"}
 Type = {"True/False" : "boolean", "Multiple" : "multiple"}
 
+Number_Question = 10
 
 
 print("Hi, Welcome!")
 
 print("Here is the Menu:")
 
-
-#Print the number and the category
 for i in Categories:
     print(i, Categories[i])
 
@@ -48,7 +45,6 @@ print('Great, which difficulty ? ')
 for i in Difficulty:
     print(i, Difficulty[i])
 
-#Check valid input
 check_loop = True
 while check_loop:
     Chosen_Diff = int(input("Please, input here a valid number for a difficulty: "))
@@ -62,7 +58,6 @@ print('\n')
 
 #----------------NB QUESTIONS------------
 NB_Questions = 0
-#Check valid input
 while NB_Questions < 1 or NB_Questions >50:
     NB_Questions = int(input('How many Questions ? (<50) '))
 
@@ -73,7 +68,6 @@ print('Finally, which type ? ')
 for i in Type1:
     print(i, Type1[i])
 
-#Check valid input
 check_loop = True
 while check_loop:
     Chosen_type = int(input("Please, input here a valid number for a difficulty: "))
@@ -89,6 +83,7 @@ print("Your", str(Difficulty[Chosen_Diff]), str(NB_Questions), "quizz about", st
 
 
 url = "https://opentdb.com/api.php?amount="+str(NB_Questions)+ "&category=" + str(Chosen_Cat) + "&difficulty=" + str(Difficulty[Chosen_Diff]) +"&type=" + str(Type[Type1[Chosen_type]])
+print(url)
 
 response = requests.get(url)
 
