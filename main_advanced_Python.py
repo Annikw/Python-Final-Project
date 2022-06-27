@@ -137,3 +137,4 @@ else:
     print("\n")
     print("You final score is:", Score,"/",(NB_Questions), "or", (Score/NB_Questions)*100,"%" )
     
+#test
