@@ -31,11 +31,7 @@ from unicodedata import category
 import requests
 import random
 
-# NOTE: Standardize formatting of comments
-# NOTE: Move classes to separate files
-# NOTE: Wrap code in a function and call it using if _name_ == '_main_'
-# NOTE: Use functions to encapsulate concepts. 
-#       e.g. instead of comments such as "Retrieving data from API based on user's choices" create a function called 'retrieve_questions', ...
+# NOTE: Standardize formatting of comments --> Annik to do
 
 
 
@@ -95,9 +91,6 @@ print('\n')
 
 #----------------Retrieving data from API based on user's choices-------------------------
 
-# NOTE: what is this used for?
-Score = 0
-
 #url for choosing only category and number of questions
 # NOTE: abstract the API logic away behind a function or even create a `question_api` class to interact with
 url = "https://opentdb.com/api.php?amount="+str(NB_Questions)+ "&category=" + str(Chosen_Cat) + "&type=boolean"
@@ -106,14 +99,7 @@ response = requests.get(url)
 response_json = response.json()
 
 #--------------------------------OOP based approach---------------------------------
-'''Note from Annik: here we could also try to always extract a mix of difficulties from the API by selecting 'Any difficulty' 
-This way, based on whether the previous answer was right or wrong --> the next question could have a different difficulty (the professor proposed
-this when talking to him in class)
-
-Note from Wilm:
-The quiz is now automatically adjusting difficulty based on the previous answer. 
-I think it might be easiest if we only take True/False questions. That would make the coding part easier with only minor 
-reduction in functionality, since we will never actually use the quiz in real life.
+'''The quiz is now automatically adjusting difficulty based on the previous answer. 
 We should keep in mind that we now need a much larger set of questions, since we have to adjust to their skill level. The current code
 automatically redirects the user to a different difficulty level if we run out of questions for any one difficulty. 
 '''
@@ -219,10 +205,7 @@ class Quiz:
             return False 
 
 #------------------------- Running the Quiz ---------------------------------
-# NOTE: shouldn't this be coming from the user input?
-number_questions_total = 5 #define how many questions we want to ask our user
-quiz = Quiz(number_questions_total, question_list_easy, question_list_medium, question_list_hard)
-
+quiz = Quiz(NB_Questions, question_list_easy, question_list_medium, question_list_hard)
 
 while quiz.remaining_questions():
     # NOTE: see above this could be a single method quiz.next_question as the state of difficulty level is already kept by quiz and does not need to be exposed here
@@ -236,4 +219,14 @@ while quiz.remaining_questions():
 print(f"Your final score is: {quiz.question_score}")
 
 # NOTE: could wrap the whole program to allow to start another quiz after this round
-# NOTE: additional features could be a score board, ...
+#@Sudanshu could you look into this?
+
+# NOTE: add additional features: a timer? Showing the level of difficulty when asking a question? Something else?
+#@Sudanshu
+
+# NOTE: Move classes to separate files 
+# NOTE: Wrap code in a function and call it using if _name_ == '_main_'
+# NOTE: Use functions to encapsulate concepts. 
+#       e.g. instead of comments such as "Retrieving data from API based on user's choices" create a function called 'retrieve_questions', ...
+#@Sudanshu
+
