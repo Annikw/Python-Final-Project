@@ -155,41 +155,147 @@ else:
     print("You final score is:", Score,"/",(NB_Questions), "or", (Score/NB_Questions)*100,"%" )
 
 
-#--------------------------------OOP based approach try-out (Annik, June 22)------------
+
+#--------------------------------OOP based approach try-out------------
 '''Note from Annik: here we could also try to always extract a mix of difficulties from the API by selecting 'Any difficulty' 
 This way, based on whether the previous answer was right or wrong --> the next question could have a different difficulty (the professor proposed
 this when talking to him in class)'''
 
-response_all_questions = response.json()['results']
+'''
+Note from Wilm:
+The quiz is now automatically adjusting difficulty based on the previous answer. 
+I think it might be easiest if we only take True/False questions. That would make the coding part easier with only minor 
+reduction in functionality, since we will never actually use the quiz in real life.
+We should keep in mind that we now need a much larger set of questions, since we have to adjust to their skill level. The current code
+automatically redirects the user to a different difficulty level if we run out of questions for any one difficulty. 
 
-#this would mean we pull data for all difficulty levels by simply not specifying the difficulty parameter
-url_OOP = "https://opentdb.com/api.php?amount="+str(NB_Questions)+ "&category=" + str(Chosen_Cat) +"&type=" + str(Type[Type1[Chosen_type]])
+'''
 
-response_OOP = requests.get(url_OOP)
-#this is an example response, consider that it is a list of dictionaries:
-test_response = {"response_code":0,"results":[{"category":"Politics","type":"boolean","difficulty":"medium","question":"Helen Clark was the 37th Prime Minister of Australia.","correct_answer":"False","incorrect_answers":["True"]},{"category":"Sports","type":"boolean","difficulty":"medium","question":"In 2008, Usain Bolt set the world record for the 100 meters with one shoelace untied.","correct_answer":"True","incorrect_answers":["False"]}]}
+#download test data
+url = "https://opentdb.com/api.php?amount=10&type=boolean" #10 True/False questions of any difficulty
+response = requests.get(url)
+response_json = response.json()
+
 
 #here we are creating a class for all the questions, not sure whether it will be necessary but it is quite easy and might make it easier to work with Quiz class after? 
 #@Wilm feel free to change though
 class Question:    
-    def _init_(self, category, type, difficulty, question, correct_answer, incorrect_answers):        
+    def _init_(self, category, q_type, difficulty, question, correct_answer, incorrect_answers):        
         self.category = category
-        self.type = type
+        self.type = q_type
         self.difficulty = difficulty
         self.question = question
         self.correct_answer = correct_answer
         self.incorrect_answers = incorrect_answers
 
-#add objects to the class
-for i in test_response['results']:
-    Question(category = i['category'], type = i['type'], difficulty = i['difficulty'], question = i['question'],
-        correct_answer = i['correct_answer'], incorrect_answers= i['incorrect_answers'])
 
-#with these objects of class Question, we can now create Quizzes.
+#add instances of the class to lists, based on their difficulty
+question_list_easy = []
+question_list_medium = []
+question_list_hard = []
+
+for i in response_json['results']:
+    new_question = Question(category = i['category'], q_type = i['type'], difficulty = i['difficulty'], question = i['question'],
+                        correct_answer = i['correct_answer'], incorrect_answers= i['incorrect_answers'])
     
-class Quiz:    
-   def _init_(self, q_list):         
-       self.question_list = q_list
-       #q_list would either represent the objects from class questions OR just the responst['results'] directly --> to be checked 
-# we can probably use some of the functions from here https://towardsaws.com/how-to-create-a-quiz-program-using-python-object-oriented-programming-concept-oops-62eaa639343b 
+    if i['difficulty'] == 'easy':
+        question_list_easy.append(new_question)
+    elif i['difficulty'] == 'medium':
+        question_list_medium.append(new_question)
+    else:
+        question_list_hard.append(new_question)
 
+#with these instances of class Question, we can now create Quizzes.
+
+
+    
+class Quiz:
+    def _init_(self, number_questions_total, q_list_easy, q_list_medium, q_list_hard):
+        
+        self.number_questions_total = number_questions_total
+        self.question_score = 0
+        
+        self.question_list_easy = q_list_easy #list of easy questions
+        self.question_list_medium = q_list_medium
+        self.question_list_hard = q_list_hard
+    
+        self.q_num_easy = 0 #counter for easy questions
+        self.q_num_medium = 0
+        self.q_num_hard = 0
+        
+        self.difficulty_level = 1 #1 for easy, 2 for medium and 3 for hard
+        
+    def next_question_easy(self):
+        try:
+            current_question = self.question_list_easy[self.q_num_easy]
+            self.q_num_easy += 1
+
+            user_answer = input(f"{self.q_num_easy + self.q_num_medium + self.q_num_hard} {current_question.question} (True/False): ")        
+            if self.check_answer(user_answer, current_question.correct_answer):
+                self.difficulty_level = 2
+        except IndexError:
+            self.difficulty_level = 2 #redirect to medium difficulty if we don't have any easy questions in dataset
+
+    def next_question_medium(self):
+        try:
+            current_question = self.question_list_medium[self.q_num_medium]
+            self.q_num_medium += 1
+
+            user_answer = input(f"{self.q_num_easy + self.q_num_medium + self.q_num_hard} {current_question.question} (True/False): ")
+            if self.check_answer(user_answer, current_question.correct_answer):
+                self.difficulty_level = 3
+            else:
+                self.difficulty_level = 1
+        except IndexError:
+            self.difficulty_level = 1
+            
+    def next_question_hard(self):
+        try:
+            current_question = self.question_list_hard[self.q_num_hard]
+            self.q_num_hard += 1
+
+            user_answer = input(f"{self.q_num_easy + self.q_num_medium + self.q_num_hard} {current_question.question} (True/False): ")
+            if self.check_answer(user_answer, current_question.correct_answer):
+                self.difficulty_level = 3
+            else:
+                self.difficulty_level = 2
+        except IndexError:
+            self.difficulty_level = 2
+        
+    def remaining_questions(self):
+        return (self.q_num_easy + self.q_num_medium + self.q_num_hard) < self.number_questions_total
+
+    def check_answer(self, user_answer, answer):
+        if user_answer.lower() == answer.lower():
+            self.question_score += 1
+            print("Awesome, You got it right!")
+            print(f"Your current score is: {self.question_score}/{self.q_num_easy + self.q_num_medium + self.q_num_hard}\n")
+            return True
+        else:
+            print("Oops, you got it wrong!")
+            print(f"The correct answer was: {answer}")
+            print(f"Your current score is: {self.question_score}/{self.q_num_easy + self.q_num_medium + self.q_num_hard}\n")
+            return False
+
+
+
+#q_list would either represent the objects from class questions OR just the response['results'] directly --> to be checked (EDIT WILM: Using instances of class Questions) 
+
+# we can probably use some of the functions from here https://towardsaws.com/how-to-create-a-quiz-program-using-python-object-oriented-programming-concept-oops-62eaa639343b
+        
+        
+
+#---------- Run the Quiz --------------
+number_questions_total = 5 #define how many questions we want to ask our user
+quiz = Quiz(number_questions_total, question_list_easy, question_list_medium, question_list_hard)
+
+
+while quiz.remaining_questions():
+    if quiz.difficulty_level == 1:
+        quiz.next_question_easy()
+    elif quiz.difficulty_level == 2:
+        quiz.next_question_medium()
+    else:
+        quiz.next_question_hard()   
+
+print(f"Your final score is: {quiz.question_score}")
