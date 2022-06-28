@@ -1,5 +1,5 @@
 """
-*Architecture/execution model*
+Architecture/execution model
 
 *   The program allows users to answer trivia questions which are tailored to the user's preferences. Users are able to choose between different 
     categories and the number of answers that they want to get.
@@ -10,9 +10,13 @@
 *   Questions are retrieved from an open API: https://opentdb.com/
 *   The class 'Questions' is created in which question details and content can be saved as object and to be able to further use these objects to create quizzes
 *   Creating the 'Quiz' class allows us to integrate different functions such as checking the answers.
-*   A user interface is created to allow our users to practise their trivia skills.
+*   A user interface is created to allow our users to practise their trivia skills. The program includes tools such as a score taking which allows
+    the user to track and improve their performance.
+    Furthermore, the user will have the chance to restart the program right after the quiz ends so that there is no limit in the amount of times
+    the user can practise. Lastly, a timer is included for the user to measure and increase the speed in which they answer questions.
 
-*Technical specifications*
+
+Technical specifications
 
 *   The class Question has the attributes category, q_type, difficulty, question, correct_answer, incorrect_answers. It saves all information about each
     specific question.
@@ -20,7 +24,7 @@
     and divides it by level of difficulty. The class Quiz includes the most essential functions for the user to effectively interact with the Quiz. The functions include:
     next_question_easy, next_question_medium, next_question_hard, remaining questions, and checking the answer.
 
-*Directory*
+Directory
 
 1. Creating dictionaries for Question settings
 2. Designing the User interaction: choosing the category & number of questions
@@ -42,7 +46,7 @@ Categories = {0 : "Random", 9 : 'General Knowledge', 10 : 'Entertainment: Books'
         30 : 'Science: Gadgets', 31: 'Entertainment: Japanese Anime & Manga', 32 : 'Entertainment: Cartoon & Animations'}
 
 
-#----------------Designing the User interaction: choosing the category-------------------------
+#----------------Designing the User interaction: choosing the category-----------------
 
 print("Hi, Welcome!")
 
@@ -114,7 +118,7 @@ response_json = clean_dataset(response.json())
 
 #--------------------------------OOP based approach for Questions and Quiz---------------------------------
 class Question:    
-    def __init__(self, category, q_type, difficulty, question, correct_answer, incorrect_answers):        
+    def _init_(self, category, q_type, difficulty, question, correct_answer, incorrect_answers):        
         self.category = category
         self.type = q_type
         self.difficulty = difficulty
@@ -138,7 +142,7 @@ for i in response_json['results']:
         question_list_hard.append(new_question)
     
 class Quiz:
-    def __init__(self, number_questions_total, q_list_easy, q_list_medium, q_list_hard):
+    def _init_(self, number_questions_total, q_list_easy, q_list_medium, q_list_hard):
         
         self.number_questions_total = number_questions_total
         self.question_score = 0
@@ -225,15 +229,10 @@ while quiz.remaining_questions():
 print(f"Your final score is: {quiz.question_score}")
 
 
-#END
-
 # NOTE: could wrap the whole program to allow to start another quiz after this round
 #@Sudanshu could you look into this?
 
 # NOTE: add additional features: a timer? Showing the level of difficulty when asking a question? Something else?
-#@Sudanshu
-
+# NOTE: Wrap code in a function and call it using if name == 'main'
 # NOTE: Move classes to separate files 
-# NOTE: Wrap code in a function and call it using if _name_ == '_main_'
-# NOTE: Use functions to encapsulate concepts. 
-#       e.g. instead of comments such as "Retrieving data from API based on user's choices" create a function called 'retrieve_questions', ...#@Sudanshu
+#@Sudanshu
