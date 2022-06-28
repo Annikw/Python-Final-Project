@@ -3,79 +3,38 @@
 
 *   The program allows users to answer trivia questions which are tailored to the user's preferences. Users are able to choose between different 
     categories and the number of answers that they want to get.
-*   The difficulty of the questions will adapt on the user's skills (will get easier when questions are answered wrong and the other way around)
-*   Dictionaries are created which save all possible categories from which the user can choose from for the quiz. This allows
-    us to cross-check whether the specifications given by the users are feasible.
-*   The user interface creates a simple way for the user to give their choices on which an API will be retrieved.
-*   Questions are retrieved from an open API
+*   The difficulty of the questions will adapt on the user's skills (questions will get easier when questions are answered wrong and the other way around)
+*   Dictionaries are created which save all possible categories from which the user can choose from for the quiz. This allows us to cross-check whether the specifications 
+    given by the users are feasible.
+*   The user interface creates a simple way for the user to give their choices on which an API will be retrieved. The choices will be saved in variables.
+*   Questions are retrieved from an open API: https://opentdb.com/
 *   The class 'Questions' is created in which question details and content can be saved as object and to be able to further use these objects to create quizzes
 *   Creating the 'Quiz' class allows us to integrate different functions such as checking the answers.
 *   A user interface is created to allow our users to practise their trivia skills.
 
 *Technical specifications*
 
-*   The class Question has the attributes category, q_type, difficulty, question, correct_answer, incorrect_answers.
-*   The class Quiz has the attributes number_questions_total, q_list_easy, q_list_medium, q_list_hard.
+*   The class Question has the attributes category, q_type, difficulty, question, correct_answer, incorrect_answers. It saves all information about each
+    specific question.
+*   The class Quiz has the attributes number_questions_total, q_list_easy, q_list_medium, q_list_hard. It saves the different questions which are part of the quiz 
+    and divides it by level of difficulty. The class Quiz includes the most essential functions for the user to effectively interact with the Quiz. The functions include:
+    next_question_easy, next_question_medium, next_question_hard, remaining questions, and checking the answer.
 
 *Directory*
 
 1. Creating dictionaries for Question settings
-2. Designing the User interaction: choosing the category
-3. Retrieving data from API based on user's choices
-4. OOP based approach: Creating the Question Class
-5. OOP based approach: Creating the Quiz Class
-6. Running the Quiz
+2. Designing the User interaction: choosing the category & number of questions
+3. Cleaning data & Retrieving data from API based on user's choices
+4. OOP based approach for Questions and Quiz
+5. Running the Quiz
 """
 
 from unicodedata import category
 import requests
 import random
 
-<<<<<<< HEAD
-#----------------Data cleaning-------------------------
-'''
-Create functions for data cleaning
-'''
-#define function that automatically replaces multiple substrings in string
-def replace_all(text, dic):
-    for i, j in dic.items():
-        text = text.replace(i, j)
-    return text
-
-#define dictionary that takes the to-be replaced string as key and the replacements as values
-replacement_values = {"#quot;": "'", "quot;": "'", "#039;": "'", "039;": "'"}
-
-#iterate through response data and clean all questions
-def clean_dataset(dataset):
-    for d in dataset["results"]:
-        d["question"] = d["question"].replace("&", "")
-        d["question"] = replace_all(d["question"], replacement_values)
-
-        d["correct_answer"] = d["correct_answer"].replace("&", "")
-        d["correct_answer"] = replace_all(d["correct_answer"], replacement_values)
-        
-        for item in d["incorrect_answers"][0:3]:
-            item = item.replace("&", "")
-            item = replace_all(item, replacement_values)
-            d["incorrect_answers"].append(item)
-        del d["incorrect_answers"][0:3]
-    return dataset
-
-
-"""
-#----------------Creating dictionaries for all possible Question settings-------------------------
-''' the dictionaries will allow the user to choose the category, difficulty and question type of the questions in the quiz
-'''
-=======
-# NOTE: Standardize formatting of comments --> Annik to do
-
-
-
 #----------------Creating dictionaries for Question settings-------------------------
-'''the dictionaries will allow the user to choose the different categories'''
->>>>>>> 575a071dc10ce3d43f92607eb95b59e25abad4bb
 
-#Dictionary for the categories
 Categories = {0 : "Random", 9 : 'General Knowledge', 10 : 'Entertainment: Books', 11: 'Entertainment: Film', 12 : 'Entertainment: Music',
         13 : 'Entertainment: Musicals & Theatres', 14: 'Entertainment: Television', 15:'Entertainment: Video Games', 16 :'Entertainment: Board Games',
         17 : 'Science & Nature', 18:'Science: Computers', 19: 'Science: Mathematics', 20 : 'Mythology', 21 : 'Sports', 22: 'Geography',
@@ -84,9 +43,6 @@ Categories = {0 : "Random", 9 : 'General Knowledge', 10 : 'Entertainment: Books'
 
 
 #----------------Designing the User interaction: choosing the category-------------------------
-'''In this section, we are asking the user to give input in terms of categories, difficulty, number of questions, and type of question to allow
-the user to create a customized test design.
-Choices are saved into variables'''
 
 print("Hi, Welcome!")
 
@@ -122,113 +78,43 @@ NB_Questions = 0
 while NB_Questions < 1 or NB_Questions >50:
     # NOTE: recover if not integer input
     NB_Questions = int(input('How many Questions ? (<30) '))
-    # NOTE: this should not be stored in the same variable as this is confusing. Keep the user`s choice and do the buffering somewhere else
-    NB_Questions = NB_Questions + 20 #proposal here is to always add 20 questions more so that we can always adjust the difficulty level. --> Buffer
 print('\n')
 
-#----------------Retrieving data from API based on user's choices-------------------------
+#----------------Cleaning data & Retrieving data from API based on user's choices-------------------------
 
-#url for choosing only category and number of questions
-# NOTE: abstract the API logic away behind a function or even create a `question_api` class to interact with
-url = "https://opentdb.com/api.php?amount="+str(NB_Questions)+ "&category=" + str(Chosen_Cat) + "&type=boolean"
+#Data cleaning
+def replace_all(text, dic):
+    for i, j in dic.items():
+        text = text.replace(i, j)
+    return text
+
+replacement_values = {"#quot;": "'", "quot;": "'", "#039;": "'", "039;": "'"}
+
+def clean_dataset(dataset):
+    for d in dataset["results"]:
+        d["question"] = d["question"].replace("&", "")
+        d["question"] = replace_all(d["question"], replacement_values)
+
+        d["correct_answer"] = d["correct_answer"].replace("&", "")
+        d["correct_answer"] = replace_all(d["correct_answer"], replacement_values)
+        
+        for item in d["incorrect_answers"][0:3]:
+            item = item.replace("&", "")
+            item = replace_all(item, replacement_values)
+            d["incorrect_answers"].append(item)
+        del d["incorrect_answers"][0:3]
+    return dataset
+
+#Retrieving data
+buffer = 20
+url = "https://opentdb.com/api.php?amount="+str(NB_Questions+ buffer)+ "&category=" + str(Chosen_Cat) + "&type=boolean"
 
 response = requests.get(url)
-response_json = response.json()
+response_json = clean_dataset(response.json())
 
-<<<<<<< HEAD
-Score = 0
-
-#Check that we have enough questions for the constrains
-#(Sometimes, the API doesn't generate any questions: e.g. Cat:27, Questions:40, Level: Hard, Type: Multiple)
-
-
-#--------------------------------Non OOP based approach-------------------------
-#Q from Annik: what happens if the number of questions is equal to the length of the response??
-
-if len(response.json()['results']) == 0:
-    print("Sorry, we don't have any question with these requirments .. ")
-    # --> When OOP, makes it redirect the user to the "form" class, where the user input it's choices
-else:
-    if len(response.json()['results']) < NB_Questions:
-        print("Sorry, there are only", len(response.json()['results']), "available.. Let's start anyway!")
-        NB_Questions = len(response.json()['results'])
-
-    for i in range(NB_Questions):
-        print(response.json()['results'][i]['question'])
-        list_answers = []
-        list_answers.append(response.json()['results'][i]['correct_answer'])
-        for j in response.json()['results'][i]['incorrect_answers']:
-            list_answers.append(j)
-        list_answers = random.sample(list_answers, len(list_answers))
-
-
-        #4 options if multiple choice
-        if int(Chosen_type) == 2:
-            keys_dict_multiple = [1, 2, 3, 4]
-            questions_dict = {1: str(list_answers[0]), 2: str(list_answers[1]), 3: str(list_answers[2]), 4: str(list_answers[3])}
-
-        #2 options if True/False
-        elif int(Chosen_type) == 1:
-            keys_dict_boolean = [1, 2]
-            questions_dict = {1: str(list_answers[0]), 2: str(list_answers[1])}
-
-
-        for question in questions_dict:
-            print(question, questions_dict[question])
-
-        answered = input("Input the number corresponding to the answer: ")
-
-        if questions_dict[int(answered)] == response.json()['results'][i]['correct_answer']:
-            print("correct answer")
-            Score += 1
-            print("Current Score: ", Score,"/",(i+1))
-        else:
-            print("Wrong answer, the correct asnwer was: ", response.json()['results'][i]['correct_answer'])
-            print("Current Score: ", Score, "/", (i + 1))
-
-
-    print("\n")
-    print("You final score is:", Score,"/",(NB_Questions), "or", (Score/NB_Questions)*100,"%" )
-
-
-"""
-#--------------------------------OOP based approach try-out------------
-'''Note from Annik: here we could also try to always extract a mix of difficulties from the API by selecting 'Any difficulty' 
-This way, based on whether the previous answer was right or wrong --> the next question could have a different difficulty (the professor proposed
-this when talking to him in class)'''
-
-'''
-Note from Wilm:
-The quiz is now automatically adjusting difficulty based on the previous answer. 
-I think it might be easiest if we only take True/False questions. That would make the coding part easier with only minor 
-reduction in functionality, since we will never actually use the quiz in real life.
-=======
-#--------------------------------OOP based approach---------------------------------
-'''The quiz is now automatically adjusting difficulty based on the previous answer. 
->>>>>>> 575a071dc10ce3d43f92607eb95b59e25abad4bb
-We should keep in mind that we now need a much larger set of questions, since we have to adjust to their skill level. The current code
-automatically redirects the user to a different difficulty level if we run out of questions for any one difficulty. 
-'''
-
-<<<<<<< HEAD
-#download test data
-url = "https://opentdb.com/api.php?amount=10&type=boolean" #10 True/False questions of any difficulty
-response = requests.get(url)
-response_json = response.json()
-
-
-#clean data
-clean_dataset(response_json) 
-
-#here we are creating a class for all the questions, not sure whether it will be necessary but it is quite easy and might make it easier to work with Quiz class after? 
-#@Wilm feel free to change though
+#--------------------------------OOP based approach for Questions and Quiz---------------------------------
 class Question:    
     def __init__(self, category, q_type, difficulty, question, correct_answer, incorrect_answers):        
-=======
-#Creating Question as the class including all details for each question (questions as the objects of the class)
-class Question:    
-    def init(self, category, q_type, difficulty, question, correct_answer, incorrect_answers):        
->>>>>>> 575a071dc10ce3d43f92607eb95b59e25abad4bb
         self.category = category
         self.type = q_type
         self.difficulty = difficulty
@@ -236,14 +122,13 @@ class Question:
         self.correct_answer = correct_answer
         self.incorrect_answers = incorrect_answers
 
-#add instances of the class to lists, based on their difficulty
 question_list_easy = []
 question_list_medium = []
 question_list_hard = []
 
 for i in response_json['results']:
-    new_question = Question(category = i['category'], q_type = i['type'], difficulty = i['difficulty'], question = i['question'],
-                        correct_answer = i['correct_answer'], incorrect_answers= i['incorrect_answers'])
+    new_question = Question(category = i['category'], q_type = i['type'], 
+                            difficulty = i['difficulty'], question = i['question'], correct_answer = i['correct_answer'], incorrect_answers= i['incorrect_answers'])
     
     if i['difficulty'] == 'easy':
         question_list_easy.append(new_question)
@@ -251,8 +136,6 @@ for i in response_json['results']:
         question_list_medium.append(new_question)
     else:
         question_list_hard.append(new_question)
-
-#with these instances of class Question, we can now create Quizzes.
     
 class Quiz:
     def __init__(self, number_questions_total, q_list_easy, q_list_medium, q_list_hard):
@@ -326,6 +209,7 @@ class Quiz:
             print(f"Your current score is: {self.question_score}/{self.q_num_easy + self.q_num_medium + self.q_num_hard}\n")
             return False 
 
+
 #------------------------- Running the Quiz ---------------------------------
 quiz = Quiz(NB_Questions, question_list_easy, question_list_medium, question_list_hard)
 
@@ -340,6 +224,9 @@ while quiz.remaining_questions():
 
 print(f"Your final score is: {quiz.question_score}")
 
+
+#END
+
 # NOTE: could wrap the whole program to allow to start another quiz after this round
 #@Sudanshu could you look into this?
 
@@ -349,6 +236,4 @@ print(f"Your final score is: {quiz.question_score}")
 # NOTE: Move classes to separate files 
 # NOTE: Wrap code in a function and call it using if _name_ == '_main_'
 # NOTE: Use functions to encapsulate concepts. 
-#       e.g. instead of comments such as "Retrieving data from API based on user's choices" create a function called 'retrieve_questions', ...
-#@Sudanshu
-
+#       e.g. instead of comments such as "Retrieving data from API based on user's choices" create a function called 'retrieve_questions', ...#@Sudanshu
