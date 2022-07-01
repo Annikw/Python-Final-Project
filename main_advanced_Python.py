@@ -236,3 +236,4 @@ print(f"Your final score is: {quiz.question_score}")
 # NOTE: Wrap code in a function and call it using if name == 'main'
 # NOTE: Move classes to separate files 
 # my first changes are given
+#sudhanshuDubey
