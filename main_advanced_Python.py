@@ -235,4 +235,4 @@ print(f"Your final score is: {quiz.question_score}")
 # NOTE: add additional features: a timer? Showing the level of difficulty when asking a question? Something else?
 # NOTE: Wrap code in a function and call it using if name == 'main'
 # NOTE: Move classes to separate files 
-#@Sudanshu is a good boy
+# my first change
