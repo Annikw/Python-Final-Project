@@ -34,87 +34,10 @@ Directory
 """
 
 from unicodedata import category
-import requests
 import random
+import requests
+import time
 
-#----------------Creating dictionaries for Question settings-------------------------
-
-Categories = {0 : "Random", 9 : 'General Knowledge', 10 : 'Entertainment: Books', 11: 'Entertainment: Film', 12 : 'Entertainment: Music',
-        13 : 'Entertainment: Musicals & Theatres', 14: 'Entertainment: Television', 15:'Entertainment: Video Games', 16 :'Entertainment: Board Games',
-        17 : 'Science & Nature', 18:'Science: Computers', 19: 'Science: Mathematics', 20 : 'Mythology', 21 : 'Sports', 22: 'Geography',
-        23 : 'History', 24 : 'Politics', 25 : 'Art', 26:'Celebrities', 27 : 'Animals', 28 : 'Vehicles', 29 :  'Entertainment: Comics',
-        30 : 'Science: Gadgets', 31: 'Entertainment: Japanese Anime & Manga', 32 : 'Entertainment: Cartoon & Animations'}
-
-
-#----------------Designing the User interaction: choosing the category-----------------
-
-print("Hi, Welcome!")
-
-print("Here is the Menu:")
-
-#-----CATEGORY-----
-
-#Print the number and the category
-for i in Categories:
-    print(i, Categories[i])
-
-# NOTE: can get rid of this variable and instead use a while true: with a break
-check_loop = True
-while check_loop:
-    #Input Category
-    # NOTE: use snake case (lower case beginning)
-    Chose_Cat = 0
-    # NOTE: validate that the user input is actually a number and recover if not
-    Chosen_Cat = int(input("Please, input here a (valid) number for a category: "))
-    #Check valid category
-    try:
-        print('You have chosen :', Categories[Chosen_Cat])
-        check_loop = False
-    except:
-        check_loop = True
-
-print('\n')
-
-#-----NB QUESTIONS-----
-# NOTE: better variable naming and move this all into a function
-NB_Questions = 0
-#Check valid input
-while NB_Questions < 1 or NB_Questions >50:
-    # NOTE: recover if not integer input
-    NB_Questions = int(input('How many Questions ? (<30) '))
-print('\n')
-
-#----------------Cleaning data & Retrieving data from API based on user's choices-------------------------
-
-#Data cleaning
-def replace_all(text, dic):
-    for i, j in dic.items():
-        text = text.replace(i, j)
-    return text
-
-replacement_values = {"#quot;": "'", "quot;": "'", "#039;": "'", "039;": "'"}
-
-def clean_dataset(dataset):
-    for d in dataset["results"]:
-        d["question"] = d["question"].replace("&", "")
-        d["question"] = replace_all(d["question"], replacement_values)
-
-        d["correct_answer"] = d["correct_answer"].replace("&", "")
-        d["correct_answer"] = replace_all(d["correct_answer"], replacement_values)
-        
-        for item in d["incorrect_answers"][0:3]:
-            item = item.replace("&", "")
-            item = replace_all(item, replacement_values)
-            d["incorrect_answers"].append(item)
-        del d["incorrect_answers"][0:3]
-    return dataset
-
-#Retrieving data
-buffer = 20
-url = "https://opentdb.com/api.php?amount="+str(NB_Questions+ buffer)+ "&category=" + str(Chosen_Cat) + "&type=boolean"
-
-response = requests.get(url)
-response_json = clean_dataset(response.json())
 
 #--------------------------------OOP based approach for Questions and Quiz---------------------------------
 class Question:    
@@ -159,13 +82,22 @@ class Quiz:
         
         self.difficulty_level = 1 #1 for easy, 2 for medium and 3 for hard
         
+        #response time variable
+        self.start_time=0
+        self.end_time=0
+        self.time_diff=0
+
+        
     # NOTE: if you use a dictionary it would be easy to combine all the following three methods into one and providing "easy"/"medium"/"difficult" as a key to the method 
     def next_question_easy(self):
         try:
             current_question = self.question_list_easy[self.q_num_easy]
             self.q_num_easy += 1
 
-            user_answer = input(f"{self.q_num_easy + self.q_num_medium + self.q_num_hard} {current_question.question} (True/False): ")        
+            self.start_time= time.time
+            user_answer = input(f"{self.q_num_easy + self.q_num_medium + self.q_num_hard} {current_question.question} (True/False): ")  
+            self.end_time= time.time   
+            self.time_diff=self.end_time-self.start_time   
             if self.check_answer(user_answer, current_question.correct_answer):
                 self.difficulty_level = 2
         except IndexError:
@@ -177,7 +109,11 @@ class Quiz:
             current_question = self.question_list_medium[self.q_num_medium]
             self.q_num_medium += 1
 
+            self.start_time=time.time
             user_answer = input(f"{self.q_num_easy + self.q_num_medium + self.q_num_hard} {current_question.question} (True/False): ")
+            self.end_time=time.time
+            self.time_diff=self.end_time-self.start_time
+
             if self.check_answer(user_answer, current_question.correct_answer):
                 self.difficulty_level = 3
             else:
@@ -190,7 +126,10 @@ class Quiz:
             current_question = self.question_list_hard[self.q_num_hard]
             self.q_num_hard += 1
 
+            self.start_time=time.time()
             user_answer = input(f"{self.q_num_easy + self.q_num_medium + self.q_num_hard} {current_question.question} (True/False): ")
+            self.end_time= time.time()
+            self.time_diff=self.end_time-self.start_time
             if self.check_answer(user_answer, current_question.correct_answer):
                 self.difficulty_level = 3
             else:
@@ -227,6 +166,90 @@ while quiz.remaining_questions():
         quiz.next_question_hard()   
 
 print(f"Your final score is: {quiz.question_score}")
+
+#code will start from here------------------
+if __name__=="__main__":
+#----------------Creating dictionaries for Question settings-------------------------
+    Categories = {0 : "Random", 9 : 'General Knowledge', 10 : 'Entertainment: Books', 11: 'Entertainment: Film', 12 : 'Entertainment: Music',
+        13 : 'Entertainment: Musicals & Theatres', 14: 'Entertainment: Television', 15:'Entertainment: Video Games', 16 :'Entertainment: Board Games',
+        17 : 'Science & Nature', 18:'Science: Computers', 19: 'Science: Mathematics', 20 : 'Mythology', 21 : 'Sports', 22: 'Geography',
+        23 : 'History', 24 : 'Politics', 25 : 'Art', 26:'Celebrities', 27 : 'Animals', 28 : 'Vehicles', 29 :  'Entertainment: Comics',
+        30 : 'Science: Gadgets', 31: 'Entertainment: Japanese Anime & Manga', 32 : 'Entertainment: Cartoon & Animations'}
+
+
+#----------------Designing the User interaction: choosing the category-----------------
+
+    print("Hi, Welcome!")
+
+    print("Here is the Menu:")
+
+#-----CATEGORY-----
+
+#Print the number and the category
+    for i in Categories:
+        print(i, Categories[i])
+
+# NOTE: can get rid of this variable and instead use a while true: with a break
+    check_loop = True
+    while check_loop:
+        #Input Category
+        # NOTE: use snake case (lower case beginning)
+        Chose_Cat = 0
+        # NOTE: validate that the user input is actually a number and recover if not
+        Chosen_Cat = int(input("Please, input here a (valid) number for a category: "))
+        #Check valid category
+        try:
+            print('You have chosen :', Categories[Chosen_Cat])
+            check_loop = False
+        except:
+            check_loop = True
+
+    print('\n')
+
+    #-----NB QUESTIONS-----
+    # NOTE: better variable naming and move this all into a function
+    NB_Questions = 0
+    #Check valid input
+    while NB_Questions < 1 or NB_Questions >50:
+         # NOTE: recover if not integer input
+        NB_Questions = int(input('How many Questions ? (<30) '))
+    print('\n')
+
+    #----------------Cleaning data & Retrieving data from API based on user's choices-------------------------
+
+    #Data cleaning
+    def replace_all(text, dic):
+        for i, j in dic.items():
+            text = text.replace(i, j)
+        return text
+
+    replacement_values = {"#quot;": "'", "quot;": "'", "#039;": "'", "039;": "'"}
+
+    def clean_dataset(dataset):
+        for d in dataset["results"]:
+            d["question"] = d["question"].replace("&", "")
+            d["question"] = replace_all(d["question"], replacement_values)
+
+        d["correct_answer"] = d["correct_answer"].replace("&", "")
+        d["correct_answer"] = replace_all(d["correct_answer"], replacement_values)
+        
+        for item in d["incorrect_answers"][0:3]:
+            item = item.replace("&", "")
+            item = replace_all(item, replacement_values)
+            d["incorrect_answers"].append(item)
+        del d["incorrect_answers"][0:3]
+        return dataset
+
+#Retrieving data
+    buffer = 20
+    url = "https://opentdb.com/api.php?amount="+str(NB_Questions+ buffer)+ "&category=" + str(Chosen_Cat) + "&type=boolean"
+
+    response = requests.get(url)
+    response_json = clean_dataset(response.json())
+
+
+
+
 
 
 # NOTE: could wrap the whole program to allow to start another quiz after this round
