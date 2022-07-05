@@ -97,7 +97,7 @@ class Quiz:
                 else:
                     print("please, answer True or False")
 
-            if self.check_answer(user_answer, current_question[4]):
+            if self.check_answer(user_answer, current_question[4])==True:
                 self.difficulty_level = 2
         except IndexError:
             self.difficulty_level = 2  # redirect to medium difficulty if we don't have any easy questions in dataset
@@ -116,7 +116,7 @@ class Quiz:
                 else:
                     print("please, answer True or False")
 
-            if self.check_answer(user_answer, current_question[4]):
+            if self.check_answer(user_answer, current_question[4])==True:
                 self.difficulty_level = 3
             else:
                 self.difficulty_level = 1
@@ -137,7 +137,7 @@ class Quiz:
                 else:
                     print("please, answer True or False")
 
-            if self.check_answer(user_answer, current_question[4]):
+            if self.check_answer(user_answer, current_question[4])==True:
                 self.difficulty_level = 3
             else:
                 self.difficulty_level = 2
