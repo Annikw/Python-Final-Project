@@ -222,7 +222,7 @@ if __name__ == "__main__":
         # -----NB QUESTIONS-----
         NB_Questions = 0
         # Check valid input
-        while NB_Questions < 1 or NB_Questions > 50:
+        while NB_Questions < 1 or NB_Questions > 30:
             # NOTE: recover if not integer input
             NB_Questions = int(input('How many Questions ? (<30) '))
         print('\n')
@@ -280,8 +280,8 @@ if __name__ == "__main__":
 
         if len(response.json()['results']) < NB_Questions:
             print("sorry, it appeears that only",len(response.json()['results']) ,"questions were available! let's start anyway!")
+            NB_Questions = len(response.json()['results'])
 
-        NB_Questions = len(response.json()['results'])
         response_json = clean_dataset(response.json())
 
         question_list_easy = []
