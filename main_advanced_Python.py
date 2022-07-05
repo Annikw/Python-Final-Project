@@ -301,7 +301,7 @@ if __name__ == "__main__":
     check = True
     while restart:
         check = True
-        buffer = 10
+        buffer = 30
         Chosen_Cat = Chosen_Category()
         NB_Questions = Chosen_NB_Questions()
         url1 = "https://opentdb.com/api.php?amount="
