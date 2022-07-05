@@ -135,7 +135,7 @@ class Quiz:
             self.difficulty_level = 1
 
     def remaining_questions(self):
-        return (self.q_num_easy + self.q_num_medium + self.q_num_hard) < self.number_questions_total
+        return ((self.q_num_easy + self.q_num_medium + self.q_num_hard) < self.number_questions_total)
 
     def check_answer(self, user_answer, answer):
         if user_answer.lower() == answer.lower():
@@ -275,9 +275,7 @@ if __name__ == "__main__":
 
         if len(response.json()['results']) < NB_Questions:
             print("sorry, it appeears that only",len(response.json()['results']) ,"questions were available! let's start anyway!")
-
-
-        NB_Questions = len(response.json()['results'])
+            NB_Questions = len(response.json()['results'])
         response_json = clean_dataset(response.json())
 
         question_list_easy = []
