@@ -22,6 +22,9 @@ TECHNICAL SPECIFICATIONS
     *  remaining questions
     *  checking the answer
 *  The class docstring defines its attributes in more detail. Therefore, please find further specifications in the code below. 
+*  For running the quiz, a simple function run_quiz is created which calls the class Quiz. The run_quiz function contains an if elif function to introduce the functionality of adjusting the levels of difficulties depending on the user’s performance.
+*  The A buffer is used when pulling the questions from the API to ensure a selection of easy, medium, and difficult questions. By doing so, we can ensure that there is enough questions available to select the difficult levels that best match the skills of the user.
+
 
 LICENSE: MIT LICENSE
 Copyright (c) 2022 Annikw
